@@ -14,9 +14,9 @@ my ( $key, $method, $source, $target, $q ) = ("") x 5;
 
 my @arr = ();
 push(@arr, 'fr');
-push(@arr, 'da');
+push(@arr, 'en');
 push(@arr, 'ja');
-push(@arr, 'nl');
+push(@arr, 'en');
 push(@arr, 'ru');
 push(@arr, 'en');
 
@@ -29,29 +29,37 @@ print "\n","\n";
 
 my $i = 0;
 my $r;
+my $f = 1;
 
-while($i lt 6){
-	
-	$target = $arr[$i];
-	
-	my $gt = WWW::Google::Translate->new(
-		{   key            => $key,
-			default_source => ( $source || 'en' ),
-			default_target => ( $target || 'ja' ),
+while($f eq 1){
+	while($i lt 6){
+		
+		$target = $arr[$i];
+		
+		my $gt = WWW::Google::Translate->new(
+			{   key            => $key,
+				default_source => ( $source || 'en' ),
+				default_target => ( $target || 'ja' ),
+			}
+		);
+
+		$r = $gt->translate( { q => $q } );
+		
+		for my $trans_rh (@{ $r->{data}->{translations} })
+		{
+			$q = $trans_rh->{translatedText};
 		}
-	);
-
-	$r = $gt->translate( { q => $q } );
-	
-	for my $trans_rh (@{ $r->{data}->{translations} })
-	{
-		$q = $trans_rh->{translatedText};
+		
+		$source = $target;
+		$i = $i + 1;
 	}
-	
-	$source = $target;
-	$i = $i + 1;
+	print "Do you to paraphrase another paragraph y/n";
+	$ans = <STDIN>;
+	chomp $ans;
+	if($ans eq 'n'){
+		last;
+	}
 }
-
 
 print $q,"\n";
 __END__
